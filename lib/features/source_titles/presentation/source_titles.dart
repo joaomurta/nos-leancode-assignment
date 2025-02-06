@@ -15,6 +15,7 @@ class _SourceTitlesState extends State<SourceTitles> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -33,7 +34,7 @@ class _SourceTitlesState extends State<SourceTitles> {
                       onTap: () => Navigator.pop(context),
                       child: const Icon(
                         Icons.arrow_back,
-                        size: 20,
+                        size: 14,
                         color: Color.fromRGBO(255, 172, 172, 0.895),
                       ),
                     ),
@@ -59,8 +60,79 @@ class _SourceTitlesState extends State<SourceTitles> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                return ListTile(
-                  title: Text('Item $index'),
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                  child: Container(
+                    height: 85,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(124, 54, 33, 25),
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(
+                        color: const Color.fromRGBO(82, 49, 36, 1),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 15,
+                        right: 15,
+                        top: 10,
+                        bottom: 10,
+                      ),
+                      child: Column(
+                        spacing: 8,
+                        children: [
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Title Name',
+                              style: TextStyle(
+                                color: Color.fromRGBO(255, 172, 172, 0.895),
+                                fontWeight: FontWeight.w300,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            spacing: 6,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromRGBO(
+                                    255,
+                                    172,
+                                    172,
+                                    0.895,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    50,
+                                  ), // Large value for pill shape
+                                ),
+                                child: const Text(
+                                  'Series Name',
+                                  style: TextStyle(
+                                    color: Color.fromARGB(124, 54, 33, 25),
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                              const Text(
+                                'Year',
+                                style: TextStyle(
+                                  color: Color.fromRGBO(255, 172, 172, 0.895),
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 );
               },
               childCount: 50,
