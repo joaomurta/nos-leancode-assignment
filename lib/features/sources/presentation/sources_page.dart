@@ -1,17 +1,54 @@
-import 'package:assignment/core/navigation/routes.dart';
+import 'package:assignment/api/gen/watchmode_api.swagger.dart';
+import 'package:assignment/common/keys/page_ids.dart';
+import 'package:assignment/core/navigation/router.dart';
+import 'package:assignment/features/sources/viewModel/sources_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leancode_cubit_utils/leancode_cubit_utils.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+import '../cubit/utils_sources_cubit.dart';
+
+class SourcesPage extends Page<void> {
+  const SourcesPage({
+    super.key,
+  });
 
   @override
-  State<HomePage> createState() {
-    return _HomePageState();
+  Route<void> createRoute(BuildContext context) => AppRoute(
+        id: PageId.sourcesPage,
+        settings: this,
+        builder: (context) => BlocProvider(
+          create: (context) => UtilsSourcesCubit(
+            api: context.read(),
+          )..run(),
+          child: const _SourcesScreen(),
+        ),
+      );
+}
+
+class _SourcesScreen extends StatelessWidget {
+  const _SourcesScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sources'),
+      ),
+      body: RequestCubitBuilder(
+        cubit: context.read<UtilsSourcesCubit>(),
+        builder: (context, state) => _SourcesDataView(sourcesState: state),
+      ),
+    );
   }
 }
 
-class _HomePageState extends State<HomePage> {
+class _SourcesDataView extends StatelessWidget {
+  const _SourcesDataView({required this.sourcesState});
+
+  final SourcesState sourcesState;
+
   @override
   Widget build(BuildContext context) {
     final Widget horizontalList1 = Container(
@@ -25,7 +62,7 @@ class _HomePageState extends State<HomePage> {
             spacing: 8,
             children: [
               InkWell(
-                onTap: () => context.push(AppRoutes.sourceTitles),
+                onTap: () => context.push('AppRoutes.sourceTitles'),
                 child: Container(
                   width: 150,
                   decoration: BoxDecoration(
@@ -46,9 +83,9 @@ class _HomePageState extends State<HomePage> {
                           height: 60,
                           fit: BoxFit.cover,
                         ),
-                        const Text(
-                          'Source Name',
-                          style: TextStyle(
+                        Text(
+                          sourcesState.allSources[0].name,
+                          style: const TextStyle(
                             color: Color.fromRGBO(255, 172, 172, 0.895),
                             fontWeight: FontWeight.w300,
                             fontSize: 18,
@@ -80,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                         fit: BoxFit.cover,
                       ),
                       const Text(
-                        'Source Name',
+                        'sources[1].name',
                         style: TextStyle(
                           color: Color.fromRGBO(255, 172, 172, 0.895),
                           fontWeight: FontWeight.w300,

@@ -28,3 +28,11 @@ void main() {
     expect(find.text('1'), findsOneWidget);
   });
 }
+
+class MyApp {
+  const MyApp();
+}
+
+void testWidgets(String s, Future<Null> Function(WidgetTester tester) param1) {}
+
+class WidgetTester {}

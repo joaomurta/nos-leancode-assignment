@@ -1,17 +1,55 @@
-import 'package:assignment/core/navigation/routes.dart';
+import 'package:assignment/common/keys/page_ids.dart';
+import 'package:assignment/core/navigation/router.dart';
+import 'package:assignment/features/sources/cubit/utils_sources_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:leancode_cubit_utils/leancode_cubit_utils.dart';
 
-class SourceTitles extends StatefulWidget {
-  const SourceTitles({super.key});
+class SourceTitlesPage extends Page<void> {
+  const SourceTitlesPage({
+    super.key,
+  });
 
   @override
-  State<SourceTitles> createState() {
-    return _SourceTitlesState();
+  Route<void> createRoute(BuildContext context) => AppRoute(
+        id: PageId.sourceTitlesPage,
+        settings: this,
+        builder: (context) => BlocProvider(
+          create: (context) => UtilsSourcesCubit(
+            api: context.read(),
+          )..run(),
+          child: const _SourceTitlesScreen(),
+        ),
+      );
+}
+
+class _SourceTitlesScreen extends StatelessWidget {
+  const _SourceTitlesScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sources'),
+      ),
+      body: RequestCubitBuilder(
+        cubit: context.read<UtilsSourcesCubit>(),
+        builder: (context, state) => const _SourceTitlesDataView(),
+      ),
+    );
   }
 }
 
-class _SourceTitlesState extends State<SourceTitles> {
+class _SourceTitlesDataView extends StatefulWidget {
+  const _SourceTitlesDataView();
+
+  @override
+  State<_SourceTitlesDataView> createState() {
+    return _SourceTitlesDataViewState();
+  }
+}
+
+class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
