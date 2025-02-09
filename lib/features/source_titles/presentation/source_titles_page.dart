@@ -29,9 +29,6 @@ class _SourceTitlesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sources'),
-      ),
       body: RequestCubitBuilder(
         cubit: context.read<UtilsSourcesCubit>(),
         builder: (context, state) => const _SourceTitlesDataView(),
@@ -56,14 +53,56 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
       backgroundColor: Colors.black,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
+/*           SliverAppBar(
             automaticallyImplyLeading: false,
             backgroundColor: Colors.black,
             expandedHeight: 150,
             pinned: true,
             stretch: true,
             flexibleSpace: FlexibleSpaceBar(
+              titlePadding: const EdgeInsets.only(bottom: 8, left: 10),
               centerTitle: true,
+              title: Expanded(
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        size: 14,
+                        color: Color.fromRGBO(255, 172, 172, 0.895),
+                      ),
+                    ),
+                    Image.network(
+                      'https://www.motoxpert.pt/sh_website_category_page/static/src/img/default.png',
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
+                    ),
+                    const Text(
+                      'Sources',
+                      style: TextStyle(
+                        color: Color.fromRGBO(255, 172, 172, 0.895),
+                        fontWeight: FontWeight.w200,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ), */
+          SliverAppBar(
+            pinned: true,
+            floating: true,
+            expandedHeight: 200,
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.black,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: false,
+              titlePadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               title: Expanded(
                 child: Row(
                   spacing: 8,
