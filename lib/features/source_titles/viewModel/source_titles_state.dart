@@ -1,0 +1,48 @@
+import 'package:assignment/api/gen/watchmode_api.swagger.dart';
+
+class SourceTitlesState {
+  SourceTitlesState({
+    required this.titles,
+    required this.currentPage,
+    required this.totalPages,
+    required this.totalResults,
+    required this.hasReachedEnd,
+    required this.sourceIds,
+  });
+
+  List<TitleSummary> titles;
+  int currentPage;
+  int totalPages;
+  int totalResults;
+  bool hasReachedEnd;
+  String sourceIds;
+
+  void updateState({
+    List<TitleSummary>? titles,
+    int? currentPage,
+    int? totalPages,
+    int? totalResults,
+    bool? hasReachedEnd,
+    String? sourceIds,
+  }) {
+    if (titles != null) {
+      this.titles = titles;
+    }
+    if (currentPage != null) {
+      this.currentPage = currentPage;
+    }
+    if (totalPages != null) {
+      this.totalPages = totalPages;
+    }
+    if (totalResults != null) {
+      this.totalResults = totalResults;
+    }
+    if (hasReachedEnd != null) {
+      this.hasReachedEnd = hasReachedEnd;
+    }
+
+    if (sourceIds != null) {
+      this.sourceIds = sourceIds;
+    }
+  }
+}

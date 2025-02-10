@@ -7,15 +7,16 @@ class UtilsSourcesCubit
     extends ChopperRequestCubit<List<SourceSummary>, SourcesState> {
   UtilsSourcesCubit({required WatchmodeApi api})
       : _api = api,
+        sourcesState = SourcesState(
+          allSources: [],
+          sourcesByType: {},
+        ),
         super(
           'UtilsSourceCubit',
-          sourcesState: SourcesState(
-            allSources: [],
-            sourcesByType: {},
-          ),
         );
 
   final WatchmodeApi _api;
+  final SourcesState sourcesState;
 
   @override
   Future<Response<List<SourceSummary>>> request() => _api.sourcesGet();
@@ -24,9 +25,10 @@ class UtilsSourcesCubit
   SourcesState map(List<SourceSummary> data) {
     // Print all sources and their types
     print('All Sources Data:');
-    for (var source in data) {
+    for (final source in data) {
       print(
-          'Source: ${source.name}, Type: ${source.type} (${source.type.runtimeType})');
+        'Source: ${source.name}, Type: ${source.type} (${source.type.runtimeType})',
+      );
     }
 
     final result = _organizeByType(data);
@@ -57,16 +59,12 @@ class UtilsSourcesCubit
       switch (source.type.value) {
         case 'sub':
           matchingType = SourceType.sub;
-          break;
         case 'free':
           matchingType = SourceType.free;
-          break;
         case 'purchase':
           matchingType = SourceType.purchase;
-          break;
         case 'tve':
           matchingType = SourceType.tve;
-          break;
       }
 
       if (matchingType != null) {

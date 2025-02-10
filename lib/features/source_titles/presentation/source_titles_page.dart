@@ -1,6 +1,9 @@
+import 'package:assignment/api/gen/watchmode_api.models.swagger.dart';
 import 'package:assignment/common/keys/page_ids.dart';
+import 'package:assignment/common/widgets/loading_widget.dart';
 import 'package:assignment/core/navigation/router.dart';
-import 'package:assignment/features/sources/cubit/utils_sources_cubit.dart';
+import 'package:assignment/features/source_titles/cubit/utils_source_titles_cubit.dart';
+import 'package:assignment/features/source_titles/viewModel/source_titles_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leancode_cubit_utils/leancode_cubit_utils.dart';
@@ -8,91 +11,62 @@ import 'package:leancode_cubit_utils/leancode_cubit_utils.dart';
 class SourceTitlesPage extends Page<void> {
   const SourceTitlesPage({
     super.key,
+    required this.source,
   });
+
+  final SourceSummary source;
 
   @override
   Route<void> createRoute(BuildContext context) => AppRoute(
         id: PageId.sourceTitlesPage,
         settings: this,
         builder: (context) => BlocProvider(
-          create: (context) => UtilsSourcesCubit(
+          create: (context) => UtilsSourceTitlesCubit(
             api: context.read(),
-          )..run(),
-          child: const _SourceTitlesScreen(),
+          )..loadTitles(source.id.toString()),
+          child: _SourceTitlesScreen(
+            source: source,
+          ),
         ),
       );
 }
 
 class _SourceTitlesScreen extends StatelessWidget {
-  const _SourceTitlesScreen();
+  const _SourceTitlesScreen({required this.source});
+
+  final SourceSummary source;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: RequestCubitBuilder(
-        cubit: context.read<UtilsSourcesCubit>(),
-        builder: (context, state) => const _SourceTitlesDataView(),
+        cubit: context.read<UtilsSourceTitlesCubit>(),
+        builder: (context, state) => _SourceTitlesDataView(
+          source: source,
+          sourceTitlesState: state,
+        ),
+        onLoading: (context) => const LoadingWidget(),
       ),
     );
   }
 }
 
-class _SourceTitlesDataView extends StatefulWidget {
-  const _SourceTitlesDataView();
+class _SourceTitlesDataView extends StatelessWidget {
+  const _SourceTitlesDataView({
+    required this.sourceTitlesState,
+    required this.source,
+  });
 
-  @override
-  State<_SourceTitlesDataView> createState() {
-    return _SourceTitlesDataViewState();
-  }
-}
+  final SourceTitlesState sourceTitlesState;
+  final SourceSummary source;
 
-class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: CustomScrollView(
         slivers: [
-/*           SliverAppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.black,
-            expandedHeight: 150,
-            pinned: true,
-            stretch: true,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(bottom: 8, left: 10),
-              centerTitle: true,
-              title: Expanded(
-                child: Row(
-                  spacing: 8,
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        size: 14,
-                        color: Color.fromRGBO(255, 172, 172, 0.895),
-                      ),
-                    ),
-                    Image.network(
-                      'https://www.motoxpert.pt/sh_website_category_page/static/src/img/default.png',
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                    ),
-                    const Text(
-                      'Sources',
-                      style: TextStyle(
-                        color: Color.fromRGBO(255, 172, 172, 0.895),
-                        fontWeight: FontWeight.w200,
-                        fontSize: 24,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ), */
           SliverAppBar(
             pinned: true,
             floating: true,
@@ -116,14 +90,14 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                       ),
                     ),
                     Image.network(
-                      'https://www.motoxpert.pt/sh_website_category_page/static/src/img/default.png',
+                      source.logo100px,
                       width: 40,
                       height: 40,
                       fit: BoxFit.cover,
                     ),
-                    const Text(
-                      'Sources',
-                      style: TextStyle(
+                    Text(
+                      source.name,
+                      style: const TextStyle(
                         color: Color.fromRGBO(255, 172, 172, 0.895),
                         fontWeight: FontWeight.w200,
                         fontSize: 24,
@@ -137,6 +111,9 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
+                if (index >= sourceTitlesState.titles.length) {
+                  return null; // This tells the builder to stop
+                }
                 return Padding(
                   padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
                   child: Container(
@@ -160,11 +137,11 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                       child: Column(
                         spacing: 8,
                         children: [
-                          const Align(
+                          Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              'Title Name',
-                              style: TextStyle(
+                              sourceTitlesState.titles[index].title,
+                              style: const TextStyle(
                                 color: Color.fromRGBO(255, 172, 172, 0.895),
                                 fontWeight: FontWeight.w300,
                                 fontSize: 16,
@@ -187,18 +164,18 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                                     50,
                                   ), // Large value for pill shape
                                 ),
-                                child: const Text(
-                                  'Series Name',
-                                  style: TextStyle(
+                                child: Text(
+                                  sourceTitlesState.titles[index].type.name,
+                                  style: const TextStyle(
                                     color: Color.fromARGB(124, 54, 33, 25),
                                     fontWeight: FontWeight.w300,
                                     fontSize: 12,
                                   ),
                                 ),
                               ),
-                              const Text(
-                                'Year',
-                                style: TextStyle(
+                              Text(
+                                sourceTitlesState.titles[index].year.toString(),
+                                style: const TextStyle(
                                   color: Color.fromRGBO(255, 172, 172, 0.895),
                                   fontWeight: FontWeight.w300,
                                   fontSize: 12,
@@ -212,7 +189,7 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                   ),
                 );
               },
-              childCount: 50,
+              childCount: sourceTitlesState.titles.length,
             ),
           ),
         ],

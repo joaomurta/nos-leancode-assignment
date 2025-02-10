@@ -46,11 +46,15 @@ extension $SourcesRouteExtension on SourcesRoute {
 }
 
 extension $SourceTitlesRouteExtension on SourceTitlesRoute {
-  static SourceTitlesRoute _fromState(GoRouterState state) =>
-      SourceTitlesRoute();
+  static SourceTitlesRoute _fromState(GoRouterState state) => SourceTitlesRoute(
+        $source: state.uri.queryParameters[r'$source']!,
+      );
 
   String get location => GoRouteData.$location(
         '/source_titles',
+        queryParams: {
+          r'$source': $source,
+        },
       );
 
   void go(BuildContext context) => context.go(location);
