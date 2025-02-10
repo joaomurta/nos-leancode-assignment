@@ -22,7 +22,6 @@ class UtilsSourceTitlesCubit
   final WatchmodeApi _api;
   final SourceTitlesState sourceTitlesState;
   static const int pageLimit = 20;
-  bool _isLoading = false;
 
   @override
   Future<Response<TitlesResult>> request([String? sourceId]) =>
@@ -79,8 +78,6 @@ class UtilsSourceTitlesCubit
         emit(RequestSuccessState(sourceTitlesState));
       }
     } catch (e) {
-      print('Error loading titles: $e');
-
       // Handle error state
       sourceTitlesState.updateState(
         titles: [],
@@ -103,7 +100,7 @@ class UtilsSourceTitlesCubit
 
     try {
       sourceTitlesState.updateState(isLoadingMore: true);
-      // Important: Emit the loading state
+      // Emit the loading state
       emit(RequestSuccessState(sourceTitlesState));
 
       final nextPage = sourceTitlesState.currentPage + 1;
@@ -139,7 +136,6 @@ class UtilsSourceTitlesCubit
         emit(RequestErrorState());
       }
     } catch (e) {
-      print('Error loading more titles: $e');
       sourceTitlesState.updateState(
         hasReachedEnd: true,
         isLoadingMore: false,

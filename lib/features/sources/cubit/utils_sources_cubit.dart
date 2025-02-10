@@ -23,21 +23,7 @@ class UtilsSourcesCubit
 
   @override
   SourcesState map(List<SourceSummary> data) {
-    // Print all sources and their types
-    print('All Sources Data:');
-    for (final source in data) {
-      print(
-        'Source: ${source.name}, Type: ${source.type} (${source.type.runtimeType})',
-      );
-    }
-
     final result = _organizeByType(data);
-
-    // Print organized results
-    print('\nOrganized Results:');
-    result.forEach((key, value) {
-      print('Type $key: ${value.length} sources');
-    });
 
     return SourcesState(
       allSources: data,
@@ -52,8 +38,6 @@ class UtilsSourcesCubit
 
     // Try a different comparison approach
     for (final source in sources) {
-      print('Processing source: ${source.name} with type: ${source.type}');
-
       // Get the matching SourceType
       SourceType? matchingType;
       switch (source.type.value) {

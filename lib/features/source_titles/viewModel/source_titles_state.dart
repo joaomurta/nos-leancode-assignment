@@ -8,7 +8,7 @@ class SourceTitlesState {
     required this.totalResults,
     required this.hasReachedEnd,
     required this.sourceIds,
-    this.isLoadingMore = false, // Add this
+    this.isLoadingMore = false,
   });
 
   List<TitleSummary> titles;
@@ -17,7 +17,7 @@ class SourceTitlesState {
   int totalResults;
   bool hasReachedEnd;
   String sourceIds;
-  bool isLoadingMore; // Add this
+  bool isLoadingMore;
 
   void updateState({
     List<TitleSummary>? titles,
@@ -26,7 +26,7 @@ class SourceTitlesState {
     int? totalResults,
     bool? hasReachedEnd,
     String? sourceIds,
-    bool? isLoadingMore, // Add this
+    bool? isLoadingMore,
   }) {
     if (titles != null) {
       this.titles = titles;
