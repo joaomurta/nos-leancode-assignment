@@ -52,7 +52,7 @@ class _SourceTitlesScreen extends StatelessWidget {
   }
 }
 
-class _SourceTitlesDataView extends StatelessWidget {
+class _SourceTitlesDataView extends StatefulWidget {
   const _SourceTitlesDataView({
     required this.sourceTitlesState,
     required this.source,
@@ -62,138 +62,210 @@ class _SourceTitlesDataView extends StatelessWidget {
   final SourceSummary source;
 
   @override
+  _SourceTitlesDataViewState createState() => _SourceTitlesDataViewState();
+}
+
+class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
+  final ScrollController _scrollController = ScrollController();
+  bool _canLoadMore = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    // Check if we can load more and are near the bottom
+    if (!_canLoadMore) {
+      return;
+    }
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final threshold = maxScroll * 0.9; // Load when 90% scrolled
+
+    if (currentScroll >= threshold) {
+      _loadMore();
+    }
+  }
+
+  void _loadMore() {
+    if (!widget.sourceTitlesState.isLoadingMore &&
+        !widget.sourceTitlesState.hasReachedEnd) {
+      _canLoadMore = false;
+      context.read<UtilsSourceTitlesCubit>().loadMoreTitles();
+      // Reset _canLoadMore after a delay to prevent multiple triggers
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          setState(() {
+            _canLoadMore = true;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(_SourceTitlesDataView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reset loading flag if new data was loaded
+    if (widget.sourceTitlesState.titles.length >
+        oldWidget.sourceTitlesState.titles.length) {
+      _canLoadMore = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            floating: true,
-            expandedHeight: 200,
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.black,
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: false,
-              titlePadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              title: Expanded(
-                child: Row(
-                  spacing: 8,
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        size: 14,
-                        color: Color.fromRGBO(255, 172, 172, 0.895),
-                      ),
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        SliverAppBar(
+          pinned: true,
+          floating: true,
+          expandedHeight: 200,
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.black,
+          flexibleSpace: FlexibleSpaceBar(
+            centerTitle: false,
+            titlePadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            title: Expanded(
+              child: Row(
+                spacing: 8,
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      size: 14,
+                      color: Color.fromRGBO(255, 172, 172, 0.895),
                     ),
-                    Image.network(
-                      source.logo100px,
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
+                  ),
+                  Image.network(
+                    widget.source.logo100px,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                  ),
+                  Text(
+                    widget.source.name,
+                    style: const TextStyle(
+                      color: Color.fromRGBO(255, 172, 172, 0.895),
+                      fontWeight: FontWeight.w200,
+                      fontSize: 24,
                     ),
-                    Text(
-                      source.name,
-                      style: const TextStyle(
-                        color: Color.fromRGBO(255, 172, 172, 0.895),
-                        fontWeight: FontWeight.w200,
-                        fontSize: 24,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                if (index >= sourceTitlesState.titles.length) {
-                  return null; // This tells the builder to stop
-                }
-                return Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                  child: Container(
-                    height: 85,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(124, 54, 33, 25),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(
-                        color: const Color.fromRGBO(82, 49, 36, 1),
-                        width: 1.5,
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              // Loading indicator at the end
+              if (index == widget.sourceTitlesState.titles.length) {
+                if (widget.sourceTitlesState.isLoadingMore) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Color.fromRGBO(255, 172, 172, 0.895),
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 15,
-                        right: 15,
-                        top: 10,
-                        bottom: 10,
-                      ),
-                      child: Column(
-                        spacing: 8,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              sourceTitlesState.titles[index].title,
-                              style: const TextStyle(
-                                color: Color.fromRGBO(255, 172, 172, 0.895),
-                                fontWeight: FontWeight.w300,
-                                fontSize: 16,
-                              ),
-                            ),
+                  );
+                }
+                return null;
+              }
+
+              return Padding(
+                padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                child: Container(
+                  height: 85,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(124, 54, 33, 25),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: const Color.fromRGBO(82, 49, 36, 1),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 15,
+                      right: 15,
+                      top: 10,
+                      bottom: 10,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.sourceTitlesState.titles[index].title,
+                          style: const TextStyle(
+                            color: Color.fromRGBO(255, 172, 172, 0.895),
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16,
                           ),
-                          Row(
-                            spacing: 6,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(
-                                    255,
-                                    172,
-                                    172,
-                                    0.895,
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                    50,
-                                  ), // Large value for pill shape
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: const Color.fromRGBO(
+                                  255,
+                                  172,
+                                  172,
+                                  0.895,
                                 ),
-                                child: Text(
-                                  sourceTitlesState.titles[index].type.name,
-                                  style: const TextStyle(
-                                    color: Color.fromARGB(124, 54, 33, 25),
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 12,
-                                  ),
-                                ),
+                                borderRadius: BorderRadius.circular(50),
                               ),
-                              Text(
-                                sourceTitlesState.titles[index].year.toString(),
+                              child: Text(
+                                widget
+                                    .sourceTitlesState.titles[index].type.name,
                                 style: const TextStyle(
-                                  color: Color.fromRGBO(255, 172, 172, 0.895),
+                                  color: Color.fromARGB(124, 54, 33, 25),
                                   fontWeight: FontWeight.w300,
                                   fontSize: 12,
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              widget.sourceTitlesState.titles[index].year
+                                  .toString(),
+                              style: const TextStyle(
+                                color: Color.fromRGBO(255, 172, 172, 0.895),
+                                fontWeight: FontWeight.w300,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-              childCount: sourceTitlesState.titles.length,
-            ),
+                ),
+              );
+            },
+            childCount: widget.sourceTitlesState.titles.length +
+                (widget.sourceTitlesState.isLoadingMore ? 1 : 0),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

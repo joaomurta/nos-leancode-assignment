@@ -22,6 +22,7 @@ class UtilsSourceTitlesCubit
   final WatchmodeApi _api;
   final SourceTitlesState sourceTitlesState;
   static const int pageLimit = 20;
+  bool _isLoading = false;
 
   @override
   Future<Response<TitlesResult>> request([String? sourceId]) =>
@@ -46,47 +47,104 @@ class UtilsSourceTitlesCubit
   }
 
   Future<void> loadTitles(String sourceIds) async {
-    print('LoadTitles called with: $sourceIds');
-
-    sourceTitlesState.updateState(sourceIds: sourceIds);
-
-    emit(
-      RequestSuccessState(sourceTitlesState),
-    );
-
-    final response = await request(sourceIds);
-    if (response.isSuccessful && response.body != null) {
-      final newsourceTitlesState = map(response.body!);
-      sourceTitlesState.updateState(
-        titles: newsourceTitlesState.titles,
-        currentPage: newsourceTitlesState.currentPage,
-        totalPages: newsourceTitlesState.totalPages,
-        totalResults: newsourceTitlesState.totalResults,
-        hasReachedEnd: false,
+    try {
+      final response = await _api.listTitlesGet(
+        sourceIds: sourceIds,
+        limit: pageLimit,
+        page: 0,
       );
-      emit(RequestSuccessState(newsourceTitlesState));
-    }
-    print(
-      'Request completed ${sourceTitlesState.sourceIds} ${sourceTitlesState.titles} ${sourceTitlesState.currentPage}${sourceTitlesState.totalPages}${sourceTitlesState.totalResults}${sourceTitlesState.hasReachedEnd}',
-    );
-  }
-}
 
-extension TitleTypeExtension on TitleType {
-  String get name {
-    switch (this) {
-      case TitleType.movie:
-        return 'Movie';
-      case TitleType.shortFilm:
-        return 'Short Movie';
-      case TitleType.tvMiniseries:
-        return 'TV Mini Series';
-      case TitleType.tvSeries:
-        return 'TV Series';
-      case TitleType.tvSpecial:
-        return 'TV Special';
-      case TitleType.swaggerGeneratedUnknown:
-        return 'Unknown';
+      if (response.isSuccessful && response.body != null) {
+        sourceTitlesState.updateState(
+          titles: response.body!.titles,
+          currentPage: response.body!.page,
+          totalPages: response.body!.totalPages,
+          totalResults: response.body!.totalResults ?? 0,
+          hasReachedEnd: response.body!.page >= response.body!.totalPages,
+          sourceIds: sourceIds,
+        );
+
+        emit(RequestSuccessState(sourceTitlesState));
+      } else {
+        // Handle empty or error response
+        sourceTitlesState.updateState(
+          titles: [],
+          currentPage: 0,
+          totalPages: 0,
+          totalResults: 0,
+          hasReachedEnd: true,
+          sourceIds: sourceIds,
+        );
+
+        emit(RequestSuccessState(sourceTitlesState));
+      }
+    } catch (e) {
+      print('Error loading titles: $e');
+
+      // Handle error state
+      sourceTitlesState.updateState(
+        titles: [],
+        currentPage: 0,
+        totalPages: 0,
+        totalResults: 0,
+        hasReachedEnd: true,
+        sourceIds: sourceIds,
+      );
+
+      emit(RequestErrorState());
+    }
+  }
+
+  Future<void> loadMoreTitles() async {
+    // Prevent loading if already loading or reached end
+    if (sourceTitlesState.isLoadingMore || sourceTitlesState.hasReachedEnd) {
+      return;
+    }
+
+    try {
+      sourceTitlesState.updateState(isLoadingMore: true);
+      // Important: Emit the loading state
+      emit(RequestSuccessState(sourceTitlesState));
+
+      final nextPage = sourceTitlesState.currentPage + 1;
+      final response = await _api.listTitlesGet(
+        sourceIds: sourceTitlesState.sourceIds,
+        limit: pageLimit,
+        page: nextPage,
+      );
+
+      if (response.isSuccessful && response.body != null) {
+        final newTitles = [
+          ...sourceTitlesState.titles,
+          ...response.body!.titles,
+        ];
+
+        sourceTitlesState.updateState(
+          titles: newTitles,
+          currentPage: nextPage,
+          totalPages: response.body!.totalPages,
+          totalResults:
+              response.body!.totalResults ?? sourceTitlesState.totalResults,
+          hasReachedEnd: nextPage >= response.body!.totalPages,
+          isLoadingMore: false,
+        );
+
+        // Important: Emit success state with updated data
+        emit(RequestSuccessState(sourceTitlesState));
+      } else {
+        sourceTitlesState.updateState(
+          hasReachedEnd: true,
+          isLoadingMore: false,
+        );
+        emit(RequestErrorState());
+      }
+    } catch (e) {
+      print('Error loading more titles: $e');
+      sourceTitlesState.updateState(
+        hasReachedEnd: true,
+        isLoadingMore: false,
+      );
+      emit(RequestErrorState());
     }
   }
 }

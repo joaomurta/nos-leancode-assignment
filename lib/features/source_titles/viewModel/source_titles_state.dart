@@ -8,6 +8,7 @@ class SourceTitlesState {
     required this.totalResults,
     required this.hasReachedEnd,
     required this.sourceIds,
+    this.isLoadingMore = false, // Add this
   });
 
   List<TitleSummary> titles;
@@ -16,6 +17,7 @@ class SourceTitlesState {
   int totalResults;
   bool hasReachedEnd;
   String sourceIds;
+  bool isLoadingMore; // Add this
 
   void updateState({
     List<TitleSummary>? titles,
@@ -24,6 +26,7 @@ class SourceTitlesState {
     int? totalResults,
     bool? hasReachedEnd,
     String? sourceIds,
+    bool? isLoadingMore, // Add this
   }) {
     if (titles != null) {
       this.titles = titles;
@@ -40,9 +43,32 @@ class SourceTitlesState {
     if (hasReachedEnd != null) {
       this.hasReachedEnd = hasReachedEnd;
     }
-
     if (sourceIds != null) {
       this.sourceIds = sourceIds;
+    }
+
+    if (isLoadingMore != null) {
+      this.isLoadingMore = isLoadingMore;
+    }
+  }
+}
+
+// Extension for type formatting
+extension TitleTypeExtension on TitleType {
+  String get name {
+    switch (this) {
+      case TitleType.movie:
+        return 'Movie';
+      case TitleType.shortFilm:
+        return 'Short Movie';
+      case TitleType.tvMiniseries:
+        return 'TV Mini Series';
+      case TitleType.tvSeries:
+        return 'TV Series';
+      case TitleType.tvSpecial:
+        return 'TV Special';
+      case TitleType.swaggerGeneratedUnknown:
+        return 'Unknown';
     }
   }
 }
