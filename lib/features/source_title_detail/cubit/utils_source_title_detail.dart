@@ -49,13 +49,11 @@ class UtilsSourceTitleDetailCubit
       final response = await request(titleId);
 
       if (response.isSuccessful && response.body != null) {
-        // Just use map and emit the new state
         emit(RequestSuccessState(map(response.body!)));
       } else {
         emit(RequestErrorState());
       }
     } catch (e) {
-      print('Error loading title details: $e');
       emit(RequestErrorState());
     }
   }

@@ -1,4 +1,5 @@
 import 'package:assignment/api/gen/watchmode_api.models.swagger.dart';
+import 'package:assignment/common/extensions/title_type_extension.dart';
 import 'package:assignment/common/keys/page_ids.dart';
 import 'package:assignment/common/widgets/loading_widget.dart';
 import 'package:assignment/core/navigation/router.dart';
@@ -236,9 +237,10 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                             ),
                           ),
                           Row(
+                            spacing: 8,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(4),
+                                padding: const EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                   color: const Color.fromRGBO(
                                     255,
@@ -258,7 +260,6 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
                               Text(
                                 widget.sourceTitlesState.titles[index].year
                                     .toString(),
