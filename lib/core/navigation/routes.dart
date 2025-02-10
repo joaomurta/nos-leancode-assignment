@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:assignment/api/gen/watchmode_api.swagger.dart';
+import 'package:assignment/features/source_title_detail/presentation/source_title_page.dart';
 import 'package:assignment/features/source_titles/presentation/source_titles_page.dart';
 import 'package:assignment/features/sources/presentation/sources_page.dart';
 import 'package:flutter/widgets.dart';
@@ -30,10 +31,23 @@ class SourceTitlesRoute extends GoRouteData {
   }
 }
 
+class SourceTitleDetailRoute extends GoRouteData {
+  SourceTitleDetailRoute({
+    required this.titleId,
+  });
+
+  final String titleId;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) =>
+      SourceTitleDetailPage(titleId: titleId);
+}
+
 @TypedShellRoute<RootRoute>(
   routes: [
     TypedGoRoute<SourcesRoute>(path: '/'),
-    TypedGoRoute<SourceTitlesRoute>(path: '/source_titles'),
+    TypedGoRoute<SourceTitlesRoute>(path: '/source-titles'),
+    TypedGoRoute<SourceTitleDetailRoute>(path: '/title-detail'),
   ],
 )
 class RootRoute extends ShellRouteData {

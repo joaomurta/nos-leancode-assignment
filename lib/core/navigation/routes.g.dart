@@ -18,8 +18,12 @@ RouteBase get $rootRoute => ShellRouteData.$route(
           factory: $SourcesRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/source_titles',
+          path: '/source-titles',
           factory: $SourceTitlesRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
+          path: '/title-detail',
+          factory: $SourceTitleDetailRouteExtension._fromState,
         ),
       ],
     );
@@ -51,9 +55,32 @@ extension $SourceTitlesRouteExtension on SourceTitlesRoute {
       );
 
   String get location => GoRouteData.$location(
-        '/source_titles',
+        '/source-titles',
         queryParams: {
           r'$source': $source,
+        },
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $SourceTitleDetailRouteExtension on SourceTitleDetailRoute {
+  static SourceTitleDetailRoute _fromState(GoRouterState state) =>
+      SourceTitleDetailRoute(
+        titleId: state.uri.queryParameters['title-id']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/title-detail',
+        queryParams: {
+          'title-id': titleId,
         },
       );
 

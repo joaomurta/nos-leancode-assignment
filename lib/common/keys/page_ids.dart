@@ -1,1 +1,1 @@
-enum PageId { sourcesPage, sourceTitlesPage }
+enum PageId { sourcesPage, sourceTitlesPage, sourceTitleDetailPage }
