@@ -181,11 +181,7 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                 if (widget.sourceTitlesState.isLoadingMore) {
                   return const Padding(
                     padding: EdgeInsets.all(16),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Color.fromRGBO(255, 172, 172, 0.895),
-                      ),
-                    ),
+                    child: LoadingWidget(),
                   );
                 }
                 return null;

@@ -10,5 +10,4 @@ class SourcesState {
 
   final List<SourceSummary> allSources;
   final Map<SourceType, List<SourceSummary>> sourcesByType;
-  static const List<String> availableTypes = ['sub', 'free', 'purchase', 'tve'];
 }

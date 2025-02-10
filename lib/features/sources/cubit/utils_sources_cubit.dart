@@ -36,9 +36,8 @@ class UtilsSourcesCubit
   ) {
     final organized = <SourceType, List<SourceSummary>>{};
 
-    // Try a different comparison approach
     for (final source in sources) {
-      // Get the matching SourceType
+      // matching SourceType
       SourceType? matchingType;
       switch (source.type.value) {
         case 'sub':

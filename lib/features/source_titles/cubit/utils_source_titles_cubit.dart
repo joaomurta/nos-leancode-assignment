@@ -20,32 +20,78 @@ class UtilsSourceTitlesCubit
         super('UtilsSourceTitlesCubit');
 
   final WatchmodeApi _api;
-  final SourceTitlesState sourceTitlesState;
+  SourceTitlesState sourceTitlesState;
   static const int pageLimit = 20;
 
   @override
-  Future<Response<TitlesResult>> request([String? sourceId]) =>
+  Future<Response<TitlesResult>> request([String? sourceId, int? page]) =>
       _api.listTitlesGet(
         sourceIds: sourceId,
         limit: pageLimit,
-        page: sourceTitlesState.currentPage,
+        page: page,
       );
 
   @override
   SourceTitlesState map(TitlesResult data) {
     final newTitles = [...sourceTitlesState.titles, ...data.titles];
 
-    return SourceTitlesState(
+    sourceTitlesState = SourceTitlesState(
       titles: newTitles,
       currentPage: data.page,
       totalPages: data.totalPages,
       totalResults: data.totalResults ?? 0,
       hasReachedEnd: data.page >= data.totalPages,
       sourceIds: sourceTitlesState.sourceIds,
+      isLoadingMore: sourceTitlesState.isLoadingMore,
     );
+
+    return sourceTitlesState;
   }
 
   Future<void> loadTitles(String sourceIds) async {
+    try {
+      final response = await request(sourceIds);
+
+      if (response.isSuccessful && response.body != null) {
+        emit(RequestSuccessState(map(response.body!)));
+      }
+    } catch (e) {
+      // Handle error state
+      emit(RequestErrorState());
+    }
+  }
+
+  Future<void> loadMoreTitles() async {
+    // Prevent loading if already loading or reached end
+    if (sourceTitlesState.isLoadingMore || sourceTitlesState.hasReachedEnd) {
+      return;
+    }
+
+    try {
+      sourceTitlesState.updateState(isLoadingMore: true);
+      // Emit the loading state
+      emit(RequestSuccessState(sourceTitlesState));
+
+      final nextPage = sourceTitlesState.currentPage + 1;
+      final response = await request(sourceTitlesState.sourceIds, nextPage);
+
+      if (response.isSuccessful && response.body != null) {
+        sourceTitlesState.updateState(
+          isLoadingMore: false,
+        );
+
+        // Emit success state with updated data
+        emit(RequestSuccessState(map(response.body!)));
+      }
+    } catch (e) {
+      sourceTitlesState.updateState(
+        hasReachedEnd: true,
+        isLoadingMore: false,
+      );
+      emit(RequestErrorState());
+    }
+  }
+  /* Future<void> loadTitles(String sourceIds) async {
     try {
       final response = await _api.listTitlesGet(
         sourceIds: sourceIds,
@@ -61,6 +107,7 @@ class UtilsSourceTitlesCubit
           totalResults: response.body!.totalResults ?? 0,
           hasReachedEnd: response.body!.page >= response.body!.totalPages,
           sourceIds: sourceIds,
+
         );
 
         emit(RequestSuccessState(sourceTitlesState));
@@ -90,9 +137,9 @@ class UtilsSourceTitlesCubit
 
       emit(RequestErrorState());
     }
-  }
+  } */
 
-  Future<void> loadMoreTitles() async {
+/*   Future<void> loadMoreTitles() async {
     // Prevent loading if already loading or reached end
     if (sourceTitlesState.isLoadingMore || sourceTitlesState.hasReachedEnd) {
       return;
@@ -104,11 +151,7 @@ class UtilsSourceTitlesCubit
       emit(RequestSuccessState(sourceTitlesState));
 
       final nextPage = sourceTitlesState.currentPage + 1;
-      final response = await _api.listTitlesGet(
-        sourceIds: sourceTitlesState.sourceIds,
-        limit: pageLimit,
-        page: nextPage,
-      );
+      final response = await request(sourceTitlesState.sourceIds, nextPage);
 
       if (response.isSuccessful && response.body != null) {
         final newTitles = [
@@ -126,7 +169,7 @@ class UtilsSourceTitlesCubit
           isLoadingMore: false,
         );
 
-        // Important: Emit success state with updated data
+        // Emit success state with updated data
         emit(RequestSuccessState(sourceTitlesState));
       } else {
         sourceTitlesState.updateState(
@@ -142,5 +185,5 @@ class UtilsSourceTitlesCubit
       );
       emit(RequestErrorState());
     }
-  }
+  } */
 }

@@ -20,9 +20,7 @@ class SourcesListView extends StatelessWidget {
           final source = sources[index];
           return Padding(
             padding: const EdgeInsets.only(
-              right: 16, // Adds space between items
-              // If you want the last item to have padding too:
-              // right: index == sources.length - 1 ? 20 : 16,
+              right: 16,
             ),
             child: SourceCard(source: source),
           );
