@@ -50,8 +50,6 @@ class UtilsSourceTitleDetailCubit
 
       if (response.isSuccessful && response.body != null) {
         emit(RequestSuccessState(map(response.body!)));
-      } else {
-        emit(RequestErrorState());
       }
     } catch (e) {
       emit(RequestErrorState());

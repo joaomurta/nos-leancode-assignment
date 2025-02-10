@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:assignment/api/gen/watchmode_api.models.swagger.dart';
 import 'package:assignment/common/extensions/title_type_extension.dart';
 import 'package:assignment/common/keys/page_ids.dart';
@@ -136,39 +138,48 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
         SliverAppBar(
           pinned: true,
           floating: true,
-          expandedHeight: 100,
+          expandedHeight: 130,
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.black,
-          flexibleSpace: FlexibleSpaceBar(
-            centerTitle: false,
-            titlePadding: const EdgeInsets.only(left: 10, bottom: 5),
-            title: Expanded(
-              child: Row(
-                spacing: 8,
-                children: [
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      size: 14,
-                      color: Color.fromRGBO(255, 172, 172, 0.895),
-                    ),
+          backgroundColor: Colors.black.withAlpha(128),
+          flexibleSpace: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: 10,
+                sigmaY: 10,
+              ),
+              child: FlexibleSpaceBar(
+                centerTitle: false,
+                titlePadding:
+                    const EdgeInsets.only(left: 10, bottom: 5, top: 5),
+                title: Expanded(
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          size: 14,
+                          color: Color.fromRGBO(255, 172, 172, 0.895),
+                        ),
+                      ),
+                      Image.network(
+                        widget.source.logo100px,
+                        width: 65,
+                        height: 65,
+                        fit: BoxFit.scaleDown,
+                      ),
+                      Text(
+                        widget.source.name,
+                        style: const TextStyle(
+                          color: Color.fromRGBO(255, 172, 172, 0.895),
+                          fontWeight: FontWeight.w200,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ],
                   ),
-                  Image.network(
-                    widget.source.logo100px,
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                  ),
-                  Text(
-                    widget.source.name,
-                    style: const TextStyle(
-                      color: Color.fromRGBO(255, 172, 172, 0.895),
-                      fontWeight: FontWeight.w200,
-                      fontSize: 24,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
