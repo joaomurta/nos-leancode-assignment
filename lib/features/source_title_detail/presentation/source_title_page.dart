@@ -1,6 +1,7 @@
 import 'package:assignment/common/keys/page_ids.dart';
 import 'package:assignment/common/widgets/loading_widget.dart';
 import 'package:assignment/core/navigation/router.dart';
+import 'package:assignment/features/source_title_detail/cubit/utils_source_title_detail.dart';
 import 'package:assignment/features/source_title_detail/viewModel/source_title_detail_state.dart';
 import 'package:assignment/features/source_titles/cubit/utils_source_titles_cubit.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +21,11 @@ class SourceTitleDetailPage extends Page<void> {
         id: PageId.sourceTitleDetailPage,
         settings: this,
         builder: (context) => BlocProvider(
-          create: (context) => UtilsSourceTitlesCubit(
+          create: (context) => UtilsSourceTitleDetailCubit(
             api: context.read(),
-          )..run(),
+          )..loadTitle(int.tryParse(titleId) ?? 0),
           child: _SourceTitleDetailScreen(
-            titleId: titleId,
+            titleId: int.tryParse(titleId) ?? 0,
           ),
         ),
       );
@@ -33,14 +34,14 @@ class SourceTitleDetailPage extends Page<void> {
 class _SourceTitleDetailScreen extends StatelessWidget {
   const _SourceTitleDetailScreen({required this.titleId});
 
-  final String titleId;
+  final int titleId;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: RequestCubitBuilder(
-        cubit: context.read<UtilsSourceTitlesCubit>(),
+        cubit: context.read<UtilsSourceTitleDetailCubit>(),
         builder: (context, state) => _SourceTitleDetailDataView(
           detail: state,
         ),
@@ -57,6 +58,11 @@ class _SourceTitleDetailDataView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center();
+    return Center(
+      child: Text(
+        detail.title,
+        style: const TextStyle(color: Colors.white, fontSize: 35),
+      ),
+    );
   }
 }

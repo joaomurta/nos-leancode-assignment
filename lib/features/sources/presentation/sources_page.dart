@@ -1,14 +1,10 @@
-import 'dart:convert';
-
 import 'package:assignment/api/gen/watchmode_api.swagger.dart';
 import 'package:assignment/common/keys/page_ids.dart';
 import 'package:assignment/core/navigation/router.dart';
-import 'package:assignment/core/navigation/routes.dart';
 import 'package:assignment/features/sources/presentation/widgets/sources_section.dart';
 import 'package:assignment/features/sources/viewModel/sources_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:leancode_cubit_utils/leancode_cubit_utils.dart';
 
 import '../cubit/utils_sources_cubit.dart';
