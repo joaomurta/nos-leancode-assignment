@@ -11,7 +11,6 @@ class SourcesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 0,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(

@@ -1,12 +1,10 @@
-import 'dart:ui';
-
 import 'package:assignment/api/gen/watchmode_api.models.swagger.dart';
-import 'package:assignment/common/extensions/title_type_extension.dart';
 import 'package:assignment/common/keys/page_ids.dart';
-import 'package:assignment/common/widgets/loading_widget.dart';
 import 'package:assignment/core/navigation/router.dart';
 import 'package:assignment/core/navigation/routes.dart';
 import 'package:assignment/features/source_titles/cubit/utils_source_titles_cubit.dart';
+import 'package:assignment/features/source_titles/presentation/widgets/source_titles_sliver_app_bar.dart';
+import 'package:assignment/features/source_titles/presentation/widgets/source_titles_sliver_list.dart';
 import 'package:assignment/features/source_titles/viewModel/source_titles_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -129,176 +127,27 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
     }
   }
 
+  void _handleItemTap(int index) {
+    setState(() {
+      _itemSelected = index;
+    });
+
+    final titleId = widget.sourceTitlesState.titles[index].id.toString();
+    context.push(
+      SourceTitleDetailRoute(titleId: titleId).location,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       controller: _scrollController,
       slivers: [
-        SliverAppBar(
-          pinned: true,
-          floating: true,
-          expandedHeight: 130,
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.black.withAlpha(128),
-          flexibleSpace: ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 10,
-                sigmaY: 10,
-              ),
-              child: FlexibleSpaceBar(
-                centerTitle: false,
-                titlePadding:
-                    const EdgeInsets.only(left: 10, bottom: 5, top: 5),
-                title: Expanded(
-                  child: Row(
-                    spacing: 8,
-                    children: [
-                      InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          size: 14,
-                          color: Color.fromRGBO(255, 172, 172, 0.895),
-                        ),
-                      ),
-                      Image.network(
-                        widget.source.logo100px,
-                        width: 65,
-                        height: 65,
-                        fit: BoxFit.scaleDown,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) {
-                            return child;
-                          }
-                          return const LoadingWidget();
-                        },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey,
-                          width: double.infinity,
-                          height: double.infinity,
-                          child: const Icon(Icons.error),
-                        ),
-                      ),
-                      Text(
-                        widget.source.name,
-                        style: const TextStyle(
-                          color: Color.fromRGBO(255, 172, 172, 0.895),
-                          fontWeight: FontWeight.w200,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              // Loading indicator at the end
-              if (index == widget.sourceTitlesState.titles.length) {
-                if (widget.sourceTitlesState.isLoadingMore) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: LoadingWidget(),
-                  );
-                }
-                return null;
-              }
-              return Padding(
-                padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _itemSelected = index;
-                    });
-
-                    final titleId =
-                        widget.sourceTitlesState.titles[index].id.toString();
-                    context.push(
-                      SourceTitleDetailRoute(titleId: titleId).location,
-                    );
-                  },
-                  child: Container(
-                    height: 85,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: _itemSelected == index
-                          ? const Color.fromARGB(122, 132, 93, 78)
-                          : const Color.fromARGB(124, 54, 33, 25),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(
-                        color: const Color.fromRGBO(82, 49, 36, 1),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 15,
-                        right: 15,
-                      ),
-                      child: Column(
-                        spacing: 10,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.sourceTitlesState.titles[index].title,
-                            style: const TextStyle(
-                              color: Color.fromRGBO(255, 172, 172, 0.895),
-                              fontWeight: FontWeight.w300,
-                              fontSize: 16,
-                              height: 0.95,
-                            ),
-                          ),
-                          Row(
-                            spacing: 8,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(
-                                    255,
-                                    172,
-                                    172,
-                                    0.895,
-                                  ),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Text(
-                                  widget.sourceTitlesState.titles[index].type
-                                      .name,
-                                  style: const TextStyle(
-                                    color: Color.fromARGB(124, 54, 33, 25),
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                widget.sourceTitlesState.titles[index].year
-                                    .toString(),
-                                style: const TextStyle(
-                                  color: Color.fromRGBO(255, 172, 172, 0.895),
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-            childCount: widget.sourceTitlesState.titles.length +
-                (widget.sourceTitlesState.isLoadingMore ? 1 : 0),
-          ),
+        SourceTitlesSliverAppBar(source: widget.source),
+        SourceTitlesSliverList(
+          sourceTitlesState: widget.sourceTitlesState,
+          selectedIndex: _itemSelected,
+          onItemTap: _handleItemTap,
         ),
       ],
     );
