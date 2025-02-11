@@ -51,7 +51,6 @@ class _SourceTitlesScreen extends StatelessWidget {
           source: source,
           sourceTitlesState: state,
         ),
-        onLoading: (context) => const LoadingWidget(),
       ),
     );
   }
@@ -168,6 +167,18 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                         width: 65,
                         height: 65,
                         fit: BoxFit.scaleDown,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return const LoadingWidget();
+                        },
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey,
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: const Icon(Icons.error),
+                        ),
                       ),
                       Text(
                         widget.source.name,
@@ -228,10 +239,9 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                       padding: const EdgeInsets.only(
                         left: 15,
                         right: 15,
-                        top: 10,
-                        bottom: 10,
                       ),
                       child: Column(
+                        spacing: 10,
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -241,6 +251,7 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
                               color: Color.fromRGBO(255, 172, 172, 0.895),
                               fontWeight: FontWeight.w300,
                               fontSize: 16,
+                              height: 0.95,
                             ),
                           ),
                           Row(

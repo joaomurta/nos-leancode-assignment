@@ -11,7 +11,7 @@ import 'package:leancode_hooks/leancode_hooks.dart';
 
 final config = AppConfig(
   watchmodeBaseUrl: Uri.parse('https://api.watchmode.com/v1'),
-  watchmodeApiKey: 'ERgOn8wYL0z7iwKOn73BtVD8h1VH2lLZp0ztnlj0',
+  watchmodeApiKey: 'fUnvfTAnlOGrzMY4GyM6xBCuk8EyVJM0wMFZdAkC',
 );
 
 void main() {

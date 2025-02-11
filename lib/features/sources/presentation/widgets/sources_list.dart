@@ -11,7 +11,7 @@ class SourcesListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: 20),
-      margin: const EdgeInsets.symmetric(vertical: 20),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       height: 165,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,

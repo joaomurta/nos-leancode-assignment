@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:assignment/api/gen/watchmode_api.models.swagger.dart';
+import 'package:assignment/common/widgets/loading_widget.dart';
 import 'package:assignment/core/navigation/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -29,6 +30,7 @@ class SourceCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             spacing: 10,
             children: [
               Image.network(
@@ -36,6 +38,18 @@ class SourceCard extends StatelessWidget {
                 width: 60,
                 height: 60,
                 fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+                  return const LoadingWidget();
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey,
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: const Icon(Icons.error),
+                ),
               ),
               Text(
                 source.name,

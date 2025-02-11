@@ -9,5 +9,5 @@ class SourcesState {
   });
 
   final List<SourceSummary> allSources;
-  final Map<SourceType, List<SourceSummary>> sourcesByType;
+  Map<SourceType, List<SourceSummary>> sourcesByType;
 }

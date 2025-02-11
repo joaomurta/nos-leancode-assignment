@@ -23,7 +23,7 @@ class UtilsSourcesCubit
 
   @override
   SourcesState map(List<SourceSummary> data) {
-    final result = _organizeByType(data);
+    final result = getSourcesByType(data);
 
     return SourcesState(
       allSources: data,
@@ -31,31 +31,20 @@ class UtilsSourcesCubit
     );
   }
 
-  Map<SourceType, List<SourceSummary>> _organizeByType(
+  Map<SourceType, List<SourceSummary>> getSourcesByType(
     List<SourceSummary> sources,
   ) {
-    final organized = <SourceType, List<SourceSummary>>{};
+    // get types
+    final uniqueTypes = sources.map((source) => source.type).toSet();
 
-    for (final source in sources) {
-      // matching SourceType
-      SourceType? matchingType;
-      switch (source.type.value) {
-        case 'sub':
-          matchingType = SourceType.sub;
-        case 'free':
-          matchingType = SourceType.free;
-        case 'purchase':
-          matchingType = SourceType.purchase;
-        case 'tve':
-          matchingType = SourceType.tve;
-      }
+    // Create a map to store sources by type
+    final sourcesByType = <SourceType, List<SourceSummary>>{};
 
-      if (matchingType != null) {
-        organized.putIfAbsent(matchingType, () => []);
-        organized[matchingType]!.add(source);
-      }
+    // lists init for each type
+    for (final type in uniqueTypes) {
+      sourcesByType[type] =
+          sources.where((source) => source.type == type).toList();
     }
-
-    return organized;
+    return sourcesByType;
   }
 }

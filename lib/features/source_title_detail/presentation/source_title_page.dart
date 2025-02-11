@@ -85,6 +85,18 @@ class _SourceTitleDetailDataView extends StatelessWidget {
             width: double.infinity,
             height: MediaQuery.of(context).size.height / 2.6,
             fit: BoxFit.contain,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) {
+                return child;
+              }
+              return const LoadingWidget();
+            },
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: Colors.grey,
+              width: double.infinity,
+              height: double.infinity,
+              child: const Icon(Icons.error),
+            ),
           ),
           Text(
             detail.title,

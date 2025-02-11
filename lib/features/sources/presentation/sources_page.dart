@@ -1,5 +1,6 @@
-import 'package:assignment/api/gen/watchmode_api.swagger.dart';
+import 'package:assignment/common/extensions/source_type_title_extension.dart';
 import 'package:assignment/common/keys/page_ids.dart';
+import 'package:assignment/common/widgets/loading_widget.dart';
 import 'package:assignment/core/navigation/router.dart';
 import 'package:assignment/features/sources/presentation/widgets/sources_section.dart';
 import 'package:assignment/features/sources/viewModel/sources_state.dart';
@@ -49,6 +50,7 @@ class _SourcesScreen extends StatelessWidget {
       body: RequestCubitBuilder(
         cubit: context.read<UtilsSourcesCubit>(),
         builder: (context, state) => _SourcesDataView(sourcesState: state),
+        onLoading: (context) => const LoadingWidget(),
       ),
     );
   }
@@ -62,25 +64,19 @@ class _SourcesDataView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ListView(
-        children: [
-          SourcesSection(
-            title: 'Subscription',
-            sources: sourcesState.sourcesByType[SourceType.sub] ?? [],
-          ),
-          SourcesSection(
-            title: 'Free',
-            sources: sourcesState.sourcesByType[SourceType.free] ?? [],
-          ),
-          SourcesSection(
-            title: 'Purchase',
-            sources: sourcesState.sourcesByType[SourceType.purchase] ?? [],
-          ),
-          SourcesSection(
-            title: 'TV Channels',
-            sources: sourcesState.sourcesByType[SourceType.tve] ?? [],
-          ),
-        ],
+      child: ListView.builder(
+        itemCount: sourcesState.sourcesByType.length,
+        itemBuilder: (context, index) {
+          final type = sourcesState.sourcesByType.keys.elementAt(index);
+          final sources = sourcesState.sourcesByType[type] ?? [];
+          return Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: SourcesSection(
+              title: type.nameDescription,
+              sources: sources,
+            ),
+          );
+        },
       ),
     );
   }
