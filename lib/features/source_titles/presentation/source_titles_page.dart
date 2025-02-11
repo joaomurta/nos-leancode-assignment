@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:assignment/api/gen/watchmode_api.models.swagger.dart';
 import 'package:assignment/common/keys/page_ids.dart';
 import 'package:assignment/common/widgets/loading_widget.dart';
@@ -144,7 +142,7 @@ class _SourceTitlesListState extends State<SourceTitlesList> {
               ),
             );
           },
-          onLoading: (context) => const SliverFillRemaining(
+          onInitial: (context) => const SliverFillRemaining(
             child: LoadingWidget(),
           ),
         ),

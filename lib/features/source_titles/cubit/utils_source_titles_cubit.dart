@@ -50,6 +50,7 @@ class UtilsSourceTitlesCubit
 
   Future<void> loadTitles(String sourceIds) async {
     try {
+      emit(RequestInitialState());
       final response = await request(sourceIds);
 
       if (response.isSuccessful && response.body != null) {
