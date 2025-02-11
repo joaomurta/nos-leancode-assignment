@@ -1,5 +1,8 @@
+import 'dart:ffi';
+
 import 'package:assignment/api/gen/watchmode_api.models.swagger.dart';
 import 'package:assignment/common/keys/page_ids.dart';
+import 'package:assignment/common/widgets/loading_widget.dart';
 import 'package:assignment/core/navigation/router.dart';
 import 'package:assignment/core/navigation/routes.dart';
 import 'package:assignment/features/source_titles/cubit/utils_source_titles_cubit.dart';
@@ -43,31 +46,24 @@ class _SourceTitlesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: RequestCubitBuilder(
-        cubit: context.read<UtilsSourceTitlesCubit>(),
-        builder: (context, state) => _SourceTitlesDataView(
-          source: source,
-          sourceTitlesState: state,
-        ),
-      ),
+      body: SourceTitlesList(source: source),
     );
   }
 }
 
-class _SourceTitlesDataView extends StatefulWidget {
-  const _SourceTitlesDataView({
-    required this.sourceTitlesState,
+class SourceTitlesList extends StatefulWidget {
+  const SourceTitlesList({
+    super.key,
     required this.source,
   });
 
-  final SourceTitlesState sourceTitlesState;
   final SourceSummary source;
 
   @override
-  _SourceTitlesDataViewState createState() => _SourceTitlesDataViewState();
+  _SourceTitlesListState createState() => _SourceTitlesListState();
 }
 
-class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
+class _SourceTitlesListState extends State<SourceTitlesList> {
   final ScrollController _scrollController = ScrollController();
   bool _canLoadMore = true;
   int? _itemSelected;
@@ -102,8 +98,7 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
   }
 
   void _loadMore() {
-    if (!widget.sourceTitlesState.isLoadingMore &&
-        !widget.sourceTitlesState.hasReachedEnd) {
+    if (_canLoadMore) {
       _canLoadMore = false;
       context.read<UtilsSourceTitlesCubit>().loadMoreTitles();
       // Reset canLoadMore after a delay to prevent multiple triggers
@@ -117,22 +112,12 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
     }
   }
 
-  @override
-  void didUpdateWidget(_SourceTitlesDataView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Reset loading flag if new data was loaded
-    if (widget.sourceTitlesState.titles.length >
-        oldWidget.sourceTitlesState.titles.length) {
-      _canLoadMore = true;
-    }
-  }
-
-  void _handleItemTap(int index) {
+  void _handleItemTap(int index, SourceTitlesState sourceTitlesState) {
     setState(() {
       _itemSelected = index;
     });
 
-    final titleId = widget.sourceTitlesState.titles[index].id.toString();
+    final titleId = sourceTitlesState.titles[index].id.toString();
     context.push(
       SourceTitleDetailRoute(titleId: titleId).location,
     );
@@ -144,10 +129,24 @@ class _SourceTitlesDataViewState extends State<_SourceTitlesDataView> {
       controller: _scrollController,
       slivers: [
         SourceTitlesSliverAppBar(source: widget.source),
-        SourceTitlesSliverList(
-          sourceTitlesState: widget.sourceTitlesState,
-          selectedIndex: _itemSelected,
-          onItemTap: _handleItemTap,
+        RequestCubitBuilder(
+          cubit: context.read<UtilsSourceTitlesCubit>(),
+          builder: (context, sourceTitlesState) {
+            if (sourceTitlesState.titles.isNotEmpty && _canLoadMore) {
+              _canLoadMore = true;
+            }
+            return SliverPadding(
+              padding: const EdgeInsets.all(10),
+              sliver: SourceTitlesSliverList(
+                sourceTitlesState: sourceTitlesState,
+                selectedIndex: _itemSelected,
+                onItemTap: (index) => _handleItemTap(index, sourceTitlesState),
+              ),
+            );
+          },
+          onLoading: (context) => const SliverFillRemaining(
+            child: LoadingWidget(),
+          ),
         ),
       ],
     );
