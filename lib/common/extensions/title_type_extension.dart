@@ -1,7 +1,7 @@
 import 'package:assignment/api/gen/watchmode_api.enums.swagger.dart';
 
 extension TitleTypeExtension on TitleType {
-  String get name {
+  String get nameDescription {
     switch (this) {
       case TitleType.movie:
         return 'Movie';

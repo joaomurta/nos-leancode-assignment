@@ -1,8 +1,10 @@
-import 'package:assignment/common/extensions/title_type_extension.dart';
 import 'package:assignment/common/keys/page_ids.dart';
 import 'package:assignment/common/widgets/loading_widget.dart';
 import 'package:assignment/core/navigation/router.dart';
 import 'package:assignment/features/source_title_detail/cubit/utils_source_title_detail.dart';
+import 'package:assignment/features/source_title_detail/presentation/widgets/source_title_detail_categorys_info.dart';
+import 'package:assignment/features/source_title_detail/presentation/widgets/source_title_detail_header.dart';
+import 'package:assignment/features/source_title_detail/presentation/widgets/source_title_detail_more_info.dart';
 import 'package:assignment/features/source_title_detail/viewModel/source_title_detail_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -79,138 +81,14 @@ class _SourceTitleDetailDataView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 15,
         children: [
-          Image.network(
-            alignment: Alignment.centerLeft,
-            detail.poster,
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height / 2.6,
-            fit: BoxFit.contain,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) {
-                return child;
-              }
-              return const LoadingWidget();
-            },
-            errorBuilder: (context, error, stackTrace) => Container(
-              color: Colors.grey,
-              width: double.infinity,
-              height: double.infinity,
-              child: const Icon(Icons.error),
-            ),
+          SourceTitleDetailHeader(
+            detail: detail,
           ),
-          Text(
-            detail.title,
-            style: const TextStyle(
-              color: Color.fromRGBO(255, 172, 172, 0.895),
-              fontSize: 35,
-              fontWeight: FontWeight.w300,
-            ),
+          SourceTitleDetailCategorysInfo(
+            detail: detail,
           ),
-          Row(
-            spacing: 8,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(
-                    255,
-                    172,
-                    172,
-                    0.895,
-                  ),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Text(
-                  detail.type.name,
-                  style: const TextStyle(
-                    color: Color.fromARGB(124, 54, 33, 25),
-                    fontWeight: FontWeight.w300,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              Text(
-                detail.year.toString(),
-                style: const TextStyle(
-                  color: Color.fromRGBO(255, 172, 172, 0.895),
-                  fontWeight: FontWeight.w300,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            width: double.infinity,
-            height: 30,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: detail.genreNames.length,
-              itemBuilder: (context, index) {
-                final genre = detail.genreNames[index];
-                return Padding(
-                  padding: const EdgeInsets.only(
-                    right: 4,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                        color: const Color.fromRGBO(
-                          255,
-                          172,
-                          172,
-                          0.895,
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      genre,
-                      style: const TextStyle(
-                        color: Color.fromRGBO(
-                          255,
-                          172,
-                          172,
-                          0.895,
-                        ),
-                        fontWeight: FontWeight.w300,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          Text(
-            detail.overview,
-            style: const TextStyle(
-              color: Color.fromRGBO(255, 172, 172, 0.895),
-              fontWeight: FontWeight.w300,
-              fontSize: 12,
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'User Rating: ${detail.userRating}',
-                style: const TextStyle(
-                  color: Color.fromRGBO(255, 172, 172, 0.895),
-                  fontWeight: FontWeight.w300,
-                  fontSize: 12,
-                ),
-              ),
-              Text(
-                'Relevance: ${detail.relevance?.toStringAsFixed(2)} %',
-                style: const TextStyle(
-                  color: Color.fromRGBO(255, 172, 172, 0.895),
-                  fontWeight: FontWeight.w300,
-                  fontSize: 12,
-                ),
-              ),
-            ],
+          SourceTitleDetailMoreInfo(
+            detail: detail,
           ),
         ],
       ),

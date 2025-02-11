@@ -1,4 +1,5 @@
 import 'package:assignment/api/gen/watchmode_api.models.swagger.dart';
+import 'package:assignment/common/extensions/title_type_extension.dart';
 import 'package:flutter/material.dart';
 
 class SourceTitlesListItem extends StatelessWidget {
@@ -68,7 +69,7 @@ class SourceTitlesListItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Text(
-                        sourceTitle.type.name,
+                        sourceTitle.type.nameDescription,
                         style: const TextStyle(
                           color: Color.fromARGB(124, 54, 33, 25),
                           fontWeight: FontWeight.w300,
