@@ -62,53 +62,7 @@ class SourceTitlesList extends StatefulWidget {
 }
 
 class _SourceTitlesListState extends State<SourceTitlesList> {
-  final ScrollController _scrollController = ScrollController();
-  bool _canLoadMore = true;
   int? _itemSelected;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController
-      ..removeListener(_onScroll)
-      ..dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    // Check if can load more and are near the bottom
-    if (!_canLoadMore) {
-      return;
-    }
-
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    final threshold = maxScroll * 0.9; // Load when 90% scrolled
-
-    if (currentScroll >= threshold) {
-      _loadMore();
-    }
-  }
-
-  void _loadMore() {
-    if (_canLoadMore) {
-      _canLoadMore = false;
-      context.read<UtilsSourceTitlesCubit>().loadMoreTitles();
-      // Reset canLoadMore after a delay to prevent multiple triggers
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() {
-            _canLoadMore = true;
-          });
-        }
-      });
-    }
-  }
 
   void _handleItemTap(int index, SourceTitlesState sourceTitlesState) {
     setState(() {
@@ -124,15 +78,11 @@ class _SourceTitlesListState extends State<SourceTitlesList> {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
-      controller: _scrollController,
       slivers: [
         SourceTitlesSliverAppBar(source: widget.source),
         RequestCubitBuilder(
           cubit: context.read<UtilsSourceTitlesCubit>(),
           builder: (context, sourceTitlesState) {
-            if (sourceTitlesState.titles.isNotEmpty && _canLoadMore) {
-              _canLoadMore = true;
-            }
             return SliverPadding(
               padding: const EdgeInsets.all(10),
               sliver: SourceTitlesSliverList(

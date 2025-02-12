@@ -1,7 +1,9 @@
 import 'package:assignment/common/widgets/loading_widget.dart';
+import 'package:assignment/features/source_titles/cubit/utils_source_titles_cubit.dart';
 import 'package:assignment/features/source_titles/presentation/widgets/source_titles_list_item.dart';
 import 'package:assignment/features/source_titles/viewModel/source_titles_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SourceTitlesSliverList extends StatelessWidget {
   const SourceTitlesSliverList({
@@ -20,16 +22,25 @@ class SourceTitlesSliverList extends StatelessWidget {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          // Loading indicator at the end
-          if (index == sourceTitlesState.titles.length) {
-            if (sourceTitlesState.isLoadingMore) {
-              return const Padding(
-                padding: EdgeInsets.all(16),
-                child: LoadingWidget(),
-              );
-            }
+          // Always show loading cell at the end if not reached end
+          if (index == sourceTitlesState.titles.length - 1 &&
+              !sourceTitlesState.hasReachedEnd) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              // Trigger load more when reaching the loading cell
+              context.read<UtilsSourceTitlesCubit>().loadMoreTitles();
+            });
+
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: LoadingWidget(),
+            );
+          }
+
+          // Return null if we've gone past our items
+          if (index >= sourceTitlesState.titles.length) {
             return null;
           }
+
           return SourceTitlesListItem(
             sourceTitle: sourceTitlesState.titles[index],
             index: index,
@@ -37,8 +48,7 @@ class SourceTitlesSliverList extends StatelessWidget {
             onTap: () => onItemTap(index),
           );
         },
-        childCount: sourceTitlesState.titles.length +
-            (sourceTitlesState.isLoadingMore ? 1 : 0),
+        childCount: sourceTitlesState.titles.length,
       ),
     );
   }

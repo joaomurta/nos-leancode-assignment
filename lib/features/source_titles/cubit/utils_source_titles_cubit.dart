@@ -22,6 +22,7 @@ class UtilsSourceTitlesCubit
   final WatchmodeApi _api;
   SourceTitlesState sourceTitlesState;
   static const int pageLimit = 20;
+  int totalPagesMock = 5;
 
   @override
   Future<Response<TitlesResult>> request([String? sourceId, int? page]) =>
@@ -38,11 +39,10 @@ class UtilsSourceTitlesCubit
     sourceTitlesState = SourceTitlesState(
       titles: newTitles,
       currentPage: data.page,
-      totalPages: data.totalPages,
+      totalPages: totalPagesMock,
       totalResults: data.totalResults ?? 0,
-      hasReachedEnd: data.page >= data.totalPages,
+      hasReachedEnd: data.page >= totalPagesMock,
       sourceIds: sourceTitlesState.sourceIds,
-      isLoadingMore: sourceTitlesState.isLoadingMore,
     );
 
     return sourceTitlesState;
@@ -51,7 +51,7 @@ class UtilsSourceTitlesCubit
   Future<void> loadTitles(String sourceIds) async {
     try {
       emit(RequestInitialState());
-      final response = await request(sourceIds);
+      final response = await request(sourceIds, 0);
 
       if (response.isSuccessful && response.body != null) {
         emit(RequestSuccessState(map(response.body!)));
@@ -64,12 +64,11 @@ class UtilsSourceTitlesCubit
 
   Future<void> loadMoreTitles() async {
     // Prevent loading if already loading or reached end
-    if (sourceTitlesState.isLoadingMore || sourceTitlesState.hasReachedEnd) {
+    if (sourceTitlesState.hasReachedEnd) {
       return;
     }
 
     try {
-      sourceTitlesState.updateState(isLoadingMore: true);
       // Emit the loading state
       emit(RequestSuccessState(sourceTitlesState));
 
@@ -77,18 +76,11 @@ class UtilsSourceTitlesCubit
       final response = await request(sourceTitlesState.sourceIds, nextPage);
 
       if (response.isSuccessful && response.body != null) {
-        sourceTitlesState.updateState(
-          isLoadingMore: false,
-        );
-
         // Emit success state with updated data
         emit(RequestSuccessState(map(response.body!)));
       }
     } catch (e) {
-      sourceTitlesState.updateState(
-        hasReachedEnd: true,
-        isLoadingMore: false,
-      );
+      sourceTitlesState.hasReachedEnd = true;
       emit(RequestErrorState());
     }
   }

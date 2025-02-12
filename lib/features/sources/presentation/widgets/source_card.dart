@@ -17,50 +17,55 @@ class SourceCard extends StatelessWidget {
       onTap: () => context.push(
         SourceTitlesRoute($source: json.encode(source.toJson())).location,
       ),
-      child: Container(
+      child: SizedBox(
         width: 165,
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(124, 54, 33, 25),
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: const Color.fromRGBO(82, 49, 36, 1),
-            width: 1.5,
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(124, 54, 33, 25),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: const Color.fromRGBO(82, 49, 36, 1),
+              width: 1.5,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 10,
-            children: [
-              Image.network(
-                source.logo100px,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) {
-                    return child;
-                  }
-                  return const LoadingWidget();
-                },
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey,
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: const Icon(Icons.error),
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.network(
+                  source.logo100px,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    }
+                    return const LoadingWidget();
+                  },
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey,
+                    width: 60,
+                    height: 60,
+                    child: const Icon(Icons.error),
+                  ),
                 ),
-              ),
-              Text(
-                source.name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Color.fromRGBO(255, 172, 172, 0.895),
-                  fontWeight: FontWeight.w300,
-                  fontSize: 14,
+                const SizedBox(height: 10),
+                Text(
+                  source.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color.fromRGBO(255, 172, 172, 0.895),
+                    fontWeight: FontWeight.w300,
+                    fontSize: 14,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
