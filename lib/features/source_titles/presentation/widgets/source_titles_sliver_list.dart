@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SourceTitlesSliverList extends StatelessWidget {
+  // MARK: something to do
   const SourceTitlesSliverList({
     super.key,
     required this.sourceTitlesState,
@@ -17,16 +18,25 @@ class SourceTitlesSliverList extends StatelessWidget {
   final int? selectedIndex;
   final void Function(int index) onItemTap;
 
+// MARK: something to do
   @override
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
-          // Always show loading cell at the end if not reached end
-          if (index == sourceTitlesState.titles.length - 1 &&
-              !sourceTitlesState.hasReachedEnd) {
+          // First show all items
+          if (index < sourceTitlesState.titles.length) {
+            return SourceTitlesListItem(
+              sourceTitle: sourceTitlesState.titles[index],
+              index: index,
+              isSelected: selectedIndex == index,
+              onTap: () => onItemTap(index),
+            );
+          }
+
+          // Then show loading indicator as an extra item if not reached end
+          if (!sourceTitlesState.hasReachedEnd) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              // Trigger load more when reaching the loading cell
               context.read<UtilsSourceTitlesCubit>().loadMoreTitles();
             });
 
@@ -36,19 +46,10 @@ class SourceTitlesSliverList extends StatelessWidget {
             );
           }
 
-          // Return null if we've gone past our items
-          if (index >= sourceTitlesState.titles.length) {
-            return null;
-          }
-
-          return SourceTitlesListItem(
-            sourceTitle: sourceTitlesState.titles[index],
-            index: index,
-            isSelected: selectedIndex == index,
-            onTap: () => onItemTap(index),
-          );
+          return null;
         },
-        childCount: sourceTitlesState.titles.length,
+        childCount: sourceTitlesState.titles.length +
+            (sourceTitlesState.hasReachedEnd ? 0 : 1),
       ),
     );
   }

@@ -58,6 +58,7 @@ class UtilsSourceTitlesCubit
       }
     } catch (e) {
       // Handle error state
+      sourceTitlesState.hasReachedEnd = true;
       emit(RequestErrorState());
     }
   }
